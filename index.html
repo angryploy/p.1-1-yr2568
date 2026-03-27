@@ -105,6 +105,33 @@ img {
 <script>
 let currentStudent = null;
 
+function search() {
+  const name = document.getElementById("name").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  const student = students.find(
+    s => s.name === name && s.password === password
+  );
+
+  if (student) {
+    currentId = student.id;
+    document.getElementById("result").classList.remove("hidden");
+    document.getElementById("studentName").innerText = student.name;
+    document.getElementById("message").innerText = "เลือกรายการที่ต้องการดู";
+  } else {
+    alert("ไม่พบข้อมูล");
+  }
+}
+
+function showGrade() {
+  document.getElementById("gradeImg").src = currentId + "_51.jpg";
+}
+
+function showQuality() {
+  document.getElementById("gradeImg").src = currentId + "_68.jpg";
+}
+</script>;
+
 const students = [
   { name: "ณัฐชนนท์ โฉมฉาย", id: "1", password: "27022561" },
   { name: "ชวกร จัทร์ทรง", id: "2", password: "21012562" },
