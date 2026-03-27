@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ตรวจสอบผลการเรียน</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Tahoma", sans-serif;
+      background: #eef1fb;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 620px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 28px 22px 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #111;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin: 12px 0 28px;
+      font-size: 16px;
+      color: #222;
+    }
+
+    .input-box {
+      width: 100%;
+      padding: 16px 18px;
+      margin-bottom: 16px;
+      border: 1px solid #cfcfcf;
+      border-radius: 18px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .input-box:focus {
+      border-color: #5b4df2;
+      box-shadow: 0 0 0 3px rgba(91, 77, 242, 0.12);
+    }
+
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 18px;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+
+    .btn-search,
+    .btn-confirm {
+      background: #5448e8;
+      color: white;
+    }
+
+    .btn-grade {
+      background: #22c55e;
+      color: white;
+    }
+
+    .btn-quality {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .message {
+      text-align: center;
+      font-size: 16px;
+      margin: 8px 0 18px;
+      color: #d11a2a;
+    }
+
+    .success {
+      color: #15803d;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .preview-img {
+      width: 100%;
+      margin-top: 12px;
+      border-radius: 16px;
+      border: 1px solid #e5e5e5;
+      background: #fafafa;
+    }
+
+    .student-name {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      margin: 6px 0 18px;
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 ตรวจสอบผลการเรียน</h1>
+    <div class="subtitle">สำหรับผู้ปกครอง</div>
+
+    <input
+      type="text"
+      id="name"
+      class="input-box"
+      placeholder="พิมพ์ชื่อ-นามสกุลนักเรียน"
+    />
+
+    <button class="btn btn-search" onclick="searchStudent()">ค้นหา</button>
+
+    <div id="passwordSection" class="hidden">
+      <input
+        type="password"
+        id="password"
+        class="input-box"
+        placeholder="กรอกรหัส เช่น วันเกิด 01012555"
+      />
+      <button class="btn btn-confirm" onclick="checkPassword()">ยืนยัน</button>
+    </div>
+
+    <div id="resultSection" class="hidden">
+      <div id="studentName" class="student-name"></div>
+
+      <button class="btn btn-grade" onclick="showGrade()">
+        📄 เกรดนักเรียน
+      </button>
+
+      <button class="btn btn-quality" onclick="showQuality()">
+        ⭐ ระดับคุณภาพของนักเรียน
+      </button>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <img id="gradeImg" class="preview-img hidden" alt="ผลการเรียน" />
+  </div>
+
+  <script>
+    const students = [
+      { name: "ณัฐชนนท์ โฉมฉาย", password: "27022561", id: "1" },
+      { name: "ชวกร จัทร์ทรง", password: "21012562", id: "2" },
+      { name: "ดนุชัย ถันชนนาง", password: "15092551", id: "3" },
+      { name: "ไน เวท", password: "18072561", id: "4" },
+      { name: "กมลภพ นรดี", password: "29042562", id: "5" },
+      { name: "จิรโชติ ชำนาญ", password: "09062561", id: "6" },
+      { name: "วสุพล วงษ์สว่าง", password: "01102561", id: "7" },
+      { name: "ฌายิน บุญบำรุง", password: "28102561", id: "8" },
+      { name: "ธนภัทร ชดช้อย", password: "24052561", id: "9" },
+      { name: "สิร์ปพัศ โอวาท", password: "03012562", id: "10" },
+      { name: "ทวีโชค สมบุญ", password: "27052561", id: "11" },
+      { name: "เม็งเลียง สลึง", password: "22082561", id: "12" },
+      { name: "ชานนา คี", password: "22112560", id: "13" },
+      { name: "ปัณณวัฒน์ ช่างสันเทียะ", password: "03042562", id: "14" },
+      { name: "นฤเบศ แก้ววิชิต", password: "17042562", id: "15" },
+      { name: "กฤติเดช สมสุข", password: "28092561", id: "16" },
+      { name: "กฤตานนท์ แจ้งท้วม", password: "18052561", id: "17" },
+      { name: "อภิชาติ คุ้มชุ่ม", password: "18032562", id: "18" },
+      { name: "อัครพนธ์ จันทศรี", password: "28122558", id: "19" },
+      { name: "นิวฟ้าใหม่ อุปชา", password: "29012562", id: "20" },
+      { name: "ลลิตา แสงเจริญ", password: "04022562", id: "21" },
+      { name: "นวพร ปิ่นเงิน", password: "07012562", id: "22" },
+      { name: "วรันธร สุนทรานนท์", password: "04072561", id: "23" },
+      { name: "ปณตพร ศรีทองคง", password: "24072561", id: "24" },
+      { name: "ธันยพร ทิมเมือง", password: "29012561", id: "25" },
+      { name: "สุธิดารัตน์ ม่วงงาม", password: "08032562", id: "26" },
+      { name: "ณัฐธนิสชา มะนาวนอก", password: "09052562", id: "27" },
+      { name: "สายฝน ศรีวิธรรม", password: "07102561", id: "28" },
+      { name: "อร", password: "25022561", id: "29" },
+      { name: "ธัญชนก รักธรรม", password: "09062560", id: "30" },
+      { name: "ณัฐณิชา พิมพะนาม", password: "06052561", id: "31" },
+      { name: "วรัญญา วิเศษบุตร", password: "07032562", id: "32" },
+      { name: "ปทิตตา ศรีที", password: "23112561", id: "33" },
+      { name: "รัตน์ติกาล ดีมั่น", password: "04032562", id: "34" },
+      { name: "น้ำฝน", password: "29092560", id: "35" },
+      { name: "ซีมอน", password: "22052559", id: "36" },
+      { name: "เสาวลักษณ์ มอน", password: "03122559", id: "37" },
+      { name: "ปรีชญา รัตนชัย", password: "24122561", id: "38" }
+    ];
+
+    let currentStudent = null;
+
+    const nameInput = document.getElementById("name");
+    const passwordInput = document.getElementById("password");
+    const passwordSection = document.getElementById("passwordSection");
+    const resultSection = document.getElementById("resultSection");
+    const message = document.getElementById("message");
+    const gradeImg = document.getElementById("gradeImg");
+    const studentName = document.getElementById("studentName");
+
+    function resetView() {
+      resultSection.classList.add("hidden");
+      gradeImg.classList.add("hidden");
+      gradeImg.removeAttribute("src");
+      studentName.textContent = "";
+    }
+
+    function searchStudent() {
+      const inputName = nameInput.value.trim();
+
+      resetView();
+      passwordInput.value = "";
+      currentStudent = null;
+
+      if (!inputName) {
+        passwordSection.classList.add("hidden");
+        message.textContent = "กรุณากรอกชื่อ-นามสกุลนักเรียน";
+        message.classList.remove("success");
+        return;
+      }
+
+      const found = students.find(student => student.name === inputName);
+
+      if (found) {
+        currentStudent = found;
+        passwordSection.classList.remove("hidden");
+        message.textContent = "พบข้อมูล กรุณากรอกรหัสเพื่อยืนยัน";
+        message.classList.remove("success");
+      } else {
+        passwordSection.classList.add("hidden");
+        message.textContent = "ไม่พบข้อมูลนักเรียน";
+        message.classList.remove("success");
+      }
+    }
+
+    function checkPassword() {
+      if (!currentStudent) {
+        message.textContent = "กรุณาค้นหาชื่อนักเรียนก่อน";
+        message.classList.remove("success");
+        return;
+      }
+
+      const inputPassword = passwordInput.value.trim();
+
+      if (!inputPassword) {
+        message.textContent = "กรุณากรอกรหัส";
+        message.classList.remove("success");
+        return;
+      }
+
+      if (inputPassword === currentStudent.password) {
+        resultSection.classList.remove("hidden");
+        studentName.textContent = currentStudent.name;
+        message.textContent = "เลือกรายการที่ต้องการดู";
+        message.classList.remove("success");
+      } else {
+        resultSection.classList.add("hidden");
+        gradeImg.classList.add("hidden");
+        gradeImg.removeAttribute("src");
+        message.textContent = "รหัสไม่ถูกต้อง";
+        message.classList.remove("success");
+      }
+    }
+
+    function showImage(fileName) {
+      gradeImg.onload = function () {
+        gradeImg.classList.remove("hidden");
+        message.textContent = "แสดงผลเรียบร้อย";
+        message.classList.add("success");
+      };
+
+      gradeImg.onerror = function () {
+        gradeImg.classList.add("hidden");
+        gradeImg.removeAttribute("src");
+        message.textContent = "ไม่พบไฟล์รูป " + fileName;
+        message.classList.remove("success");
+      };
+
+      gradeImg.src = fileName;
+    }
+
+    function showGrade() {
+      if (!currentStudent) return;
+      showImage(currentStudent.id + "_51.jpg");
+    }
+
+    function showQuality() {
+      if (!currentStudent) return;
+      showImage(currentStudent.id + "_68.jpg");
+    }
+  </script>
+</body>
+</html>
